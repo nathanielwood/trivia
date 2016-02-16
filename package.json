@@ -8,6 +8,10 @@
   },
   "author": "Nathaniel Wood",
   "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nathanielwood/trivia.git"
+  },
   "devDependencies": {
     "xo": "^0.12.1"
   }
