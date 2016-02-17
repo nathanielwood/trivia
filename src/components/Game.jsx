@@ -2,62 +2,38 @@ import React, { Component } from 'react';
 import MultiChoice from './MultiChoice.jsx';
 import Points from './Points.jsx';
 import Status from './Status.jsx';
-import { generateQuestion } from '../data/questions';
 
 export default class Game extends Component {
   constructor() {
     super();
-    this.state = {
-      question: generateQuestion(),
-      answered: false,
-      points: 0,
-      status: {
-        visible: false,
-        correct: false,
-      },
-    };
     this.newQuestion = this.newQuestion.bind(this);
     this.selectAnswer = this.selectAnswer.bind(this);
   }
   newQuestion() {
-    this.setState({
-      question: generateQuestion(),
-      answered: false,
-      status: {
-        visible: false,
-      },
-    });
+    this.props.onNewQuestion();
   }
   selectAnswer(i) {
-    let points = this.state.points;
-    if (i === this.state.question.correct) points++;
-    this.setState({
-      answered: true,
-      status: {
-        visible: true,
-        correct: i === this.state.question.correct,
-      },
-      points,
-    });
+    if (i === this.props.question.correct) {
+      this.props.onCorrectAnswer();
+    } else {
+      this.props.onIncorrectAnswer();
+    }
   }
   render() {
     return (
       <div className="row">
         <div className="col-sm-9">
           <MultiChoice
-            question={this.state.question.text}
-            answers={this.state.question.answers}
-            correct={this.state.question.correct}
+            question={this.props.question}
             selectAnswer={this.selectAnswer}
-            answered={this.state.answered}
           />
         </div>
         <div className="col-sm-3">
-          <Points points={this.state.points} />
+          <Points points={this.props.points} />
           <hr />
           <Status
-            visible={this.state.status.visible}
-            correct={this.state.status.correct}
+            visible={this.props.status.visible}
+            correct={this.props.status.correct}
             onClick={this.newQuestion}
           />
         </div>
@@ -65,3 +41,15 @@ export default class Game extends Component {
     );
   }
 }
+Game.propTypes = {
+  onNewQuestion: React.PropTypes.func,
+  onAnswerQuestion: React.PropTypes.func,
+  onCorrectAnswer: React.PropTypes.func,
+  onIncorrectAnswer: React.PropTypes.func,
+  question: React.PropTypes.object,
+  status: React.PropTypes.shape({
+    visible: React.PropTypes.bool,
+    correct: React.PropTypes.bool,
+  }),
+  points: React.PropTypes.number,
+};

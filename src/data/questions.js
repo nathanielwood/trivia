@@ -48,5 +48,6 @@ export const generateQuestion = () => {
     text: question.text,
     answers,
     correct: rand,
+    answered: false,
   };
 };

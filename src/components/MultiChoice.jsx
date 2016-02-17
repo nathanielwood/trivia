@@ -7,32 +7,29 @@ export default class MultiChoice extends Component {
     this.selectAnswer = this.selectAnswer.bind(this);
   }
   selectAnswer(i) {
-    if (!this.props.answered) this.props.selectAnswer(i);
+    if (!this.props.question.answered) this.props.selectAnswer(i);
   }
   render() {
-    const answers = this.props.answers.map((answer, index) => (
+    const answers = this.props.question.answers.map((answer, index) => (
       <AnswerButton
         selectAnswer={this.selectAnswer}
         id={index}
         key={index}
         text={answer}
-        correct={this.props.correct === index}
-        disabled={this.props.answered}
+        correct={this.props.question.correct === index}
+        disabled={this.props.question.answered}
       />
     ));
     return (
       <div>
         <h3>Question</h3>
-        <h4>{this.props.question}</h4>
+        <h4>{this.props.question.text}</h4>
         {answers}
       </div>
     );
   }
 }
 MultiChoice.propTypes = {
-  question: React.PropTypes.string,
-  answers: React.PropTypes.array,
-  correct: React.PropTypes.number,
+  question: React.PropTypes.object,
   selectAnswer: React.PropTypes.func,
-  answered: React.PropTypes.bool,
 };
