@@ -9,6 +9,13 @@ export default class MultiChoice extends Component {
   selectAnswer(i) {
     if (!this.props.question.answered) this.props.selectAnswer(i);
   }
+  styleButton(i) {
+    if (this.props.question.answered) {
+      if (i === this.props.question.correct) return 'success';
+      if (i === this.props.question.selected) return 'danger';
+    }
+    return 'default';
+  }
   render() {
     const answers = this.props.question.answers.map((answer, index) => (
       <AnswerButton
@@ -16,6 +23,7 @@ export default class MultiChoice extends Component {
         id={index}
         key={index}
         text={answer}
+        style={this.styleButton(index)}
         correct={this.props.question.correct === index}
         disabled={this.props.question.answered}
       />

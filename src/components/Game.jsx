@@ -14,9 +14,9 @@ export default class Game extends Component {
   }
   selectAnswer(i) {
     if (i === this.props.question.correct) {
-      this.props.onCorrectAnswer();
+      this.props.onCorrectAnswer(i);
     } else {
-      this.props.onIncorrectAnswer();
+      this.props.onIncorrectAnswer(i);
     }
   }
   render() {

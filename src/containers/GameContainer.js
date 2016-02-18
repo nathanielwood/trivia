@@ -12,11 +12,11 @@ const mapDispatchToProps = (dispatch) => ({
   onNewQuestion: () => {
     dispatch(newQuestion());
   },
-  onCorrectAnswer: () => {
-    dispatch(answeredCorrect(1));
+  onCorrectAnswer: (i) => {
+    dispatch(answeredCorrect(i, 1));
   },
-  onIncorrectAnswer: () => {
-    dispatch(answeredIncorrect());
+  onIncorrectAnswer: (i) => {
+    dispatch(answeredIncorrect(i));
   },
 });
 

@@ -9,7 +9,10 @@ export const multiChoice = (state = initialState, action) => {
       return Object.assign({}, state, generateQuestion());
     case types.ANSWERED_CORRECT:
     case types.ANSWERED_INCORRECT:
-      return Object.assign({}, state, { answered: true });
+      return Object.assign({}, state, {
+        selected: action.payload.selected,
+        answered: true,
+      });
     default:
       return state;
   }

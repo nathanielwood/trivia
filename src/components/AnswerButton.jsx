@@ -5,23 +5,16 @@ export default class AnswerButton extends Component {
   constructor() {
     super();
     this.onClick = this.onClick.bind(this);
-    this.styleButton = this.styleButton.bind(this);
   }
   onClick() {
     this.props.selectAnswer(this.props.id);
-  }
-  styleButton() {
-    if (this.props.disabled && this.props.correct) {
-      return 'success';
-    }
-    return 'default';
   }
   render() {
     return (
       <Button
         onClick={this.onClick}
         bsSize="large"
-        bsStyle={this.styleButton()}
+        bsStyle={this.props.style}
         disabled={this.props.disabled}
         block
       >
@@ -35,5 +28,5 @@ AnswerButton.propTypes = {
   text: React.PropTypes.string,
   id: React.PropTypes.number,
   disabled: React.PropTypes.bool,
-  correct: React.PropTypes.bool,
+  style: React.PropTypes.string,
 };
