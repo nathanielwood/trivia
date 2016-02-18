@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import AnswerButton from './AnswerButton.jsx';
+import AnswerButton from './AnswerButton';
 
 export default class MultiChoice extends Component {
   constructor() {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import MultiChoice from './MultiChoice.jsx';
-import Points from './Points.jsx';
-import Status from './Status.jsx';
+import MultiChoice from './MultiChoice';
+import Points from './Points';
+import Status from './Status';
 
 export default class Game extends Component {
   constructor() {
