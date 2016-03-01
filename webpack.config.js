@@ -1,11 +1,9 @@
 const path = require('path');
 
 module.exports = {
-  entry: [
-    './src/client/index.jsx',
-  ],
+  entry: ['./client/index.jsx'],
   output: {
-    path: path.join(__dirname, 'build/static'),
+    path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
     publicPath: '/static/',
   },
@@ -16,12 +14,7 @@ module.exports = {
     loaders: [{
       test: /\.jsx?/,
       loaders: ['babel'],
-      include: path.join(__dirname, 'src'),
+      include: path.join(__dirname, 'client'),
     }],
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'build'),
-    inline: true,
-    noInfo: true,
   },
 };

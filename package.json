@@ -4,8 +4,7 @@
   "description": "A trivia game",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --hot",
-    "server": "node ./src/server",
+    "start": "node .",
     "seed": "node ./seed",
     "build": "webpack",
     "test": "eslint src"
@@ -26,17 +25,18 @@
     "eslint-config-airbnb": "^6.0.1",
     "eslint-plugin-react": "^4.0.0",
     "webpack": "^1.12.13",
-    "webpack-dev-server": "^1.14.1"
+    "webpack-dev-middleware": "^1.5.1",
+    "webpack-hot-middleware": "^2.7.1"
   },
   "dependencies": {
+    "body-parser": "^1.15.0",
     "express": "^4.13.4",
-    "express-graphql": "^0.4.9",
-    "graphql": "^0.4.18",
     "mongoose": "^4.4.4",
     "react": "^0.14.7",
     "react-bootstrap": "^0.28.3",
     "react-dom": "^0.14.7",
     "react-redux": "^4.4.0",
+    "react-router-redux": "^4.0.0",
     "redux": "^3.3.1"
   }
 }
