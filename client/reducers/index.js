@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
+import { routerReducer } from 'react-router-redux';
 import { multiChoice } from './multiChoice';
 import { questionStatus } from './questionStatus';
-import { points } from './points';
+import { game } from './game';
 
 export const rootReducer = combineReducers({
   multiChoice,
   questionStatus,
-  points,
+  game,
+  routing: routerReducer,
 });

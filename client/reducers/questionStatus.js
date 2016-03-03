@@ -3,22 +3,25 @@ import * as types from '../actions/actionTypes';
 const initialState = {
   visible: false,
   correct: false,
+  disableButton: false,
 };
 
 export const questionStatus = (state = initialState, action) => {
   switch (action.type) {
-    case types.NEW_QUESTION:
-      return Object.assign({}, state, { visible: false });
-    case types.ANSWERED_CORRECT:
+    case types.REQUEST_QUESTION:
+      return Object.assign({}, state, { disableButton: true });
+    case types.RECEIVE_QUESTION:
+      return Object.assign({}, state, {
+        visible: false,
+        disableButton: false,
+      });
+    case types.RECEIVE_ANSWER:
       return Object.assign({}, state, {
         visible: true,
-        correct: true,
+        correct: action.payload.question.answeredCorrect,
       });
-    case types.ANSWERED_INCORRECT:
-      return Object.assign({}, state, {
-        visible: true,
-        correct: false,
-      });
+    case types.RESET_GAME:
+      return initialState;
     default:
       return state;
   }

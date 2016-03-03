@@ -11,13 +11,6 @@ const api = express();
 api.use(urlencoded({ extended: true }));
 api.use(json());
 
-// enable CORS
-api.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
-
 // Register the Routes
 api.use('/api', router);
 

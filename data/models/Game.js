@@ -2,11 +2,39 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
+const GameQuestionSchema = new Schema({
+  text: {
+    type: String,
+  },
+  answers: {
+    type: [String],
+  },
+  correct: {
+    type: Number,
+    select: false,
+  },
+  answered: {
+    type: Boolean,
+  },
+  answeredCorrect: {
+    type: Boolean,
+  },
+  selected: {
+    type: Number,
+  },
+});
+
 const GameSchema = new Schema({
-  questions: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Question',
-  }],
+  points: {
+    type: Number,
+  },
+  questionCursor: {
+    type: Number,
+  },
+  finished: {
+    type: Boolean,
+  },
+  questions: [GameQuestionSchema],
   createdAt: {
     type: Date,
     default: Date.now,

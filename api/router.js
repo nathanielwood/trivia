@@ -1,4 +1,12 @@
 import express from 'express';
+import {
+  getGames,
+  addGame,
+  getGameById,
+  getGameQuestionById,
+  answerGameQuestion,
+  nextGameQuestion,
+} from '../data/database';
 import Question from '../data/models/Question';
 
 // Routes for the API
@@ -54,9 +62,23 @@ router.route('/questions/:question_id')
   });
 });
 
+router.route('/games')
+.get(getGames)
+.post(addGame);
+
+router.route('/games/:game_id')
+.get(getGameById);
+
+router.route('/games/:game_id/next')
+.get(nextGameQuestion);
+
+router.route('/games/:game_id/:question_id')
+.get(getGameQuestionById)
+.post(answerGameQuestion);
+
 // test route to make sure everything is working
 router.get('/', (req, res) => {
-  res.json({ message: 'hooray! welcome to our api!' });
+  res.json({ message: 'Welcome to the Trivia API' });
 });
 
 export default router;

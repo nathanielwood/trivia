@@ -24,13 +24,12 @@ export default class MultiChoice extends Component {
         key={index}
         text={answer}
         style={this.styleButton(index)}
-        correct={this.props.question.correct === index}
         disabled={this.props.question.answered}
       />
     ));
     return (
       <div>
-        <h3>Question</h3>
+        <h3>Question {this.props.questionNo} of {this.props.questionCount}</h3>
         <h4>{this.props.question.text}</h4>
         {answers}
       </div>
@@ -38,6 +37,8 @@ export default class MultiChoice extends Component {
   }
 }
 MultiChoice.propTypes = {
+  questionNo: React.PropTypes.number,
+  questionCount: React.PropTypes.number,
   question: React.PropTypes.object,
   selectAnswer: React.PropTypes.func,
 };
