@@ -12,6 +12,8 @@ import Home from './components/Home';
 import About from './components/About';
 import StartGame from './components/StartGame';
 import Game from './components/Game';
+import Question from './components/Question';
+import QuestionForm from './components/QuestionForm';
 
 const loggerMiddleware = createLogger();
 const store = createStore(
@@ -26,6 +28,9 @@ ReactDOM.render((
       <Route path="/" component={App}>
         <IndexRoute component={Home} />
         <Route path="about" component={About} />
+        <Route path="question" component={Question}>
+          <Route path="add" component={QuestionForm} />
+        </Route>
         <Route path="game" component={StartGame} />
         <Route path="game/:game_id" component={Game} />
       </Route>

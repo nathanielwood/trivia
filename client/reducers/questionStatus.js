@@ -8,14 +8,14 @@ const initialState = {
 
 export const questionStatus = (state = initialState, action) => {
   switch (action.type) {
-    case types.REQUEST_QUESTION:
+    case types.REQUEST_GAME_QUESTION:
       return Object.assign({}, state, { disableButton: true });
-    case types.RECEIVE_QUESTION:
+    case types.RECEIVE_GAME_QUESTION:
       return Object.assign({}, state, {
         visible: false,
         disableButton: false,
       });
-    case types.RECEIVE_ANSWER:
+    case types.RECEIVE_GAME_ANSWER:
       return Object.assign({}, state, {
         visible: true,
         correct: action.payload.question.answeredCorrect,

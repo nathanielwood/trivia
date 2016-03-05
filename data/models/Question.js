@@ -7,10 +7,10 @@ const QuestionSchema = new Schema({
   text: {
     type: String,
   },
-  correctAnswers: {
+  correct: {
     type: [String],
   },
-  incorrectAnswers: {
+  incorrect: {
     type: [String],
   },
   createdAt: {

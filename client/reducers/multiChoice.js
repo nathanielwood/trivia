@@ -1,4 +1,3 @@
-// import { generateQuestion } from '../data/questions';
 import * as types from '../actions/actionTypes';
 
 // MOCK UP STATE
@@ -12,10 +11,10 @@ import * as types from '../actions/actionTypes';
 
 export const multiChoice = (state = {}, action) => {
   switch (action.type) {
-    case types.RECEIVE_QUESTION:
-    case types.RECEIVE_ANSWER:
+    case types.RECEIVE_GAME_QUESTION:
+    case types.RECEIVE_GAME_ANSWER:
       return action.payload.question;
-    case types.REQUEST_ANSWER:
+    case types.REQUEST_GAME_ANSWER:
       return Object.assign({}, state, { answered: true });
     case types.RESET_GAME:
       return {};

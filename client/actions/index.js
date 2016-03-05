@@ -14,23 +14,47 @@ function receiveGame(game) {
     payload: { game },
   };
 }
-function requestAnswer() {
-  return { type: types.REQUEST_ANSWER };
+function requestGameAnswer() {
+  return { type: types.REQUEST_GAME_ANSWER };
 }
-function receiveAnswer(question) {
+function receiveGameAnswer(question) {
   return {
-    type: types.RECEIVE_ANSWER,
+    type: types.RECEIVE_GAME_ANSWER,
     payload: { question },
   };
 }
-function requestQuestion() {
-  return { type: types.REQUEST_QUESTION };
+function requestGameQuestion() {
+  return { type: types.REQUEST_GAME_QUESTION };
 }
-function receiveQuestion(question) {
+function receiveGameQuestion(question) {
   return {
-    type: types.RECEIVE_QUESTION,
+    type: types.RECEIVE_GAME_QUESTION,
     payload: { question },
   };
+}
+export function showForm() {
+  return { type: types.SHOW_FORM };
+}
+export function hideForm() {
+  return { type: types.HIDE_FORM };
+}
+function questionAddSuccess() {
+  return { type: types.QUESTION_ADD_SUCCESS };
+}
+export function resetQuestionForm() {
+  return { type: types.RESET_QUESTION_FORM };
+}
+function requestQuestions() {
+  return { type: types.REQUEST_QUESTIONS };
+}
+function receiveQuestions(questions) {
+  return {
+    type: types.RECEIVE_QUESTIONS,
+    payload: { questions },
+  };
+}
+export function resetQuestionList() {
+  return { type: types.RESET_QUESTION_LIST };
 }
 
 export function fetchGame(id) {
@@ -46,11 +70,11 @@ export function fetchGame(id) {
         .then(response => response.json())
         .then(json2 => {
           dispatch(receiveGame(json));
-          dispatch(receiveAnswer(json2));
+          dispatch(receiveGameAnswer(json2));
         });
       } else {
         dispatch(receiveGame(json));
-        dispatch(receiveQuestion(question));
+        dispatch(receiveGameQuestion(question));
       }
     });
   };
@@ -85,20 +109,20 @@ export function reset() {
 
 export function fetchNewQuestion(id) {
   return (dispatch) => {
-    dispatch(requestQuestion());
+    dispatch(requestGameQuestion());
     fetch(`http://localhost:8080/api/games/${id}/next`)
     .then(response => response.json())
     .then(json => {
       dispatch(receiveGame(json));
       const question = json.questions[json.questionCursor];
-      dispatch(receiveQuestion(question));
+      dispatch(receiveGameQuestion(question));
     });
   };
 }
 
 export function selectAnswer(gameId, questionId, index) {
   return (dispatch) => {
-    dispatch(requestAnswer());
+    dispatch(requestGameAnswer());
     return fetch(`http://localhost:8080/api/games/${gameId}/${questionId}`, {
       method: 'post',
       headers: {
@@ -112,8 +136,42 @@ export function selectAnswer(gameId, questionId, index) {
     .then(response => response.json())
     .then(json => {
       const question = json.questions[json.questionCursor];
-      dispatch(receiveAnswer(question));
+      dispatch(receiveGameAnswer(question));
       dispatch(receiveGame(json));
+    });
+  };
+}
+
+export function addQuestion(values) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/questions', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => response.json())
+      .then(json => {
+        // check for error
+        if (json.errors) return reject(json.errors);
+        dispatch(questionAddSuccess());
+        browserHistory.push('/question');
+        return resolve();
+      });
+    })
+  );
+}
+
+export function fetchQuestions() {
+  return (dispatch) => {
+    dispatch(requestQuestions());
+    fetch('http://localhost:8080/api/questions')
+    .then(response => response.json())
+    .then(json => {
+      dispatch(receiveQuestions(json));
     });
   };
 }

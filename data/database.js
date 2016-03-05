@@ -1,12 +1,12 @@
+import _ from 'lodash';
 import Question from './models/Question';
 import Game from './models/Game';
+import { validateQuestionForm } from '../client/utilities/validations';
 
-const validateQuestion = ({ text, answers }, cb) => {
-  if (!text) return cb('Question text is required');
-  if (!answers || !answers.length) return cb('An answer is required');
-  // Test whether the answer array has at least one correct answer
-  if (!answers.some(a => a.correct === true)) return cb('At least one answer needs to be correct');
-  return cb();
+// cleans array of empty strings, null or undefined variables
+const cleanArray = (array) => {
+  if (array.constructor !== Array) return array;
+  return array.filter((v) => v === 0 || v);
 };
 
 const shuffleArray = (array) => {
@@ -29,11 +29,11 @@ const shuffleArray = (array) => {
 };
 
 const generateQuestion = (question) => {
-  const rand = Math.floor(Math.random() * (question.incorrectAnswers.length + 1));
-  let answers = question.incorrectAnswers.slice();
+  const rand = Math.floor(Math.random() * (question.incorrect.length + 1));
+  let answers = question.incorrect.slice();
   answers = shuffleArray(answers);
   // assuming only one correct answer. This will need to change
-  answers.splice(rand, 0, question.correctAnswers[0]);
+  answers.splice(rand, 0, question.correct[0]);
   return {
     text: question.text,
     answers,
@@ -70,19 +70,17 @@ const getGameQuestionById = (req, res) => {
   });
 };
 
-const getQuestions = () => (
-  new Promise((resolve, reject) => {
-    Question.find({}, (err, res) => (
-      err ? reject(err) : resolve(res)
-    ));
+const getQuestions = (req, res) => (
+  Question.find({}).sort({ createdAt: 'desc' }).limit(50).exec((err, questions) => {
+    if (err) return res.send(err);
+    return res.json(questions);
   })
 );
 
-const getQuestionById = (id) => (
-  new Promise((resolve, reject) => {
-    Question.findById(id, (err, res) => (
-      err ? reject(err) : resolve(res)
-    ));
+const getQuestionById = (req, res) => (
+  Question.findById(req.params.question_id, (err, question) => {
+    if (err) return res.send(err);
+    return res.json(question);
   })
 );
 
@@ -170,17 +168,22 @@ const nextGameQuestion = (req, res) => (
   })
 );
 
-const addQuestion = ({ text, answers }) => (
-  new Promise((resolve, reject) => {
-    validateQuestion({ text, answers }, (error) => {
-      if (error) return reject(error);
-      const newQuestion = new Question({ text, answers });
-      return newQuestion.save((err, res) => (
-        err ? reject(err) : resolve(res)
-      ));
-    });
-  })
-);
+const addQuestion = (req, res) => {
+  const body = {
+    text: req.body.text,
+    correct: req.body.correct,
+    incorrect: req.body.incorrect,
+  };
+  const errors = validateQuestionForm(body);
+  if (!_.isEmpty(errors)) return res.json({ errors });
+  body.correct = cleanArray(body.correct);
+  body.incorrect = cleanArray(body.incorrect);
+  const question = new Question(body);
+  return question.save((err2, question2) => {
+    if (err2) return res.send(err2);
+    return res.json(question2);
+  });
+};
 
 export {
   getGames,
