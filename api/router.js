@@ -3,6 +3,7 @@ import {
   getQuestions,
   getQuestionById,
   addQuestion,
+  editQuestion,
   getGames,
   addGame,
   getGameById,
@@ -27,7 +28,8 @@ router.route('/questions')
 .get(getQuestions);
 
 router.route('/questions/:question_id')
-.get(getQuestionById);
+.get(getQuestionById)
+.post(editQuestion);
 // .put((req, res) => {
 //   Question.findById(req.params.question_id, (err, question) => {
 //     if (err) res.send(err);

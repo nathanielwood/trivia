@@ -168,21 +168,42 @@ const nextGameQuestion = (req, res) => (
   })
 );
 
-const addQuestion = (req, res) => {
+const processQuestion = (values) => {
   const body = {
-    text: req.body.text,
-    correct: req.body.correct,
-    incorrect: req.body.incorrect,
+    text: values.text,
+    correct: values.correct,
+    incorrect: values.incorrect,
   };
   const errors = validateQuestionForm(body);
-  if (!_.isEmpty(errors)) return res.json({ errors });
+  if (!_.isEmpty(errors)) return { errors };
   body.correct = cleanArray(body.correct);
   body.incorrect = cleanArray(body.incorrect);
+  return body;
+};
+
+const addQuestion = (req, res) => {
+  const body = processQuestion(req.body);
+  if (body.errors) return res.json({ errors: body.errors });
   const question = new Question(body);
-  return question.save((err2, question2) => {
-    if (err2) return res.send(err2);
+  return question.save((err, question2) => {
+    if (err) return res.send(err);
     return res.json(question2);
   });
+};
+
+const editQuestion = (req, res) => {
+  const body = processQuestion(req.body);
+  if (body.errors) return res.json({ errors: body.errors });
+  return Question.findByIdAndUpdate(
+    req.params.question_id,
+    body,
+    { new: true },
+    (err, question) => {
+      if (err) return res.send(err);
+      if (!question) return res.json({ message: 'Question not found' });
+      return res.json(question);
+    }
+  );
 };
 
 export {
@@ -195,4 +216,5 @@ export {
   answerGameQuestion,
   nextGameQuestion,
   addQuestion,
+  editQuestion,
 };

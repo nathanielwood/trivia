@@ -9,9 +9,11 @@ export const validateQuestionForm = (values) => {
     errors.correct = 'Required';
   }
   let incorrectError = true;
-  for (let i = 0; i <= values.incorrect.length; i++) {
-    if (values.incorrect[i]) {
-      incorrectError = false;
+  if (values.incorrect) {
+    for (let i = 0; i <= values.incorrect.length; i++) {
+      if (values.incorrect[i]) {
+        incorrectError = false;
+      }
     }
   }
   if (incorrectError) {

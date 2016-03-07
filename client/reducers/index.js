@@ -6,6 +6,7 @@ import { questionStatus } from './questionStatus';
 import { game } from './game';
 import { questionForm } from './questionForm';
 import { questionList } from './questionList';
+import { alert } from './alert';
 
 export const rootReducer = combineReducers({
   multiChoice,
@@ -13,6 +14,7 @@ export const rootReducer = combineReducers({
   game,
   questionForm,
   questionList,
+  alert,
   routing: routerReducer,
   form: formReducer,
 });

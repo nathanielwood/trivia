@@ -26,15 +26,17 @@ class QuestionList extends Component {
               <th>Question Text</th>
               <th>Correct Answer</th>
               <th>Incorrect Answers</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {list.questions && list.questions.map((question, i) => (
               <tr key={i}>
-                <td>{moment(question.createdAt).format('ddd, MMM do, YYYY, h:mm:ssA')}</td>
+                <td>{moment(question.createdAt).format('ddd. MMM do YYYY, h:mm:ssA')}</td>
                 <td>{question.text}</td>
                 <td>{question.correct.join(', ')}</td>
                 <td>{question.incorrect.join(', ')}</td>
+                <td><Link to={`/question/edit/${question._id}`}>Edit</Link></td>
               </tr>
             ))}
           </tbody>

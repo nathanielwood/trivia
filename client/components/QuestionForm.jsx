@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
-import { Input, Button, ButtonToolbar } from 'react-bootstrap';
-import { addQuestion, showForm, hideForm } from '../actions';
+import { Button, ButtonToolbar } from 'react-bootstrap';
+import { Link } from 'react-router';
 import { validateQuestionForm } from '../utilities/validations';
-
+import FormInput from './FormInput';
 
 const fields = ['text', 'correct', 'incorrect[]'];
 
@@ -12,36 +12,21 @@ const config = {
   maxIncorrect: 9,
 };
 
-const submit = (values, dispatch) => (
-  dispatch(addQuestion(values))
-);
-
 class QuestionForm extends Component {
   constructor() {
     super();
-    this.validationState = this.validationState.bind(this);
     this.addIncorrectAnswer = this.addIncorrectAnswer.bind(this);
     this.removeIncorrectAnswer = this.removeIncorrectAnswer.bind(this);
     this.disableAddIncorrectButton = this.disableAddIncorrectButton.bind(this);
     this.disableRemoveIncorrectButton = this.disableRemoveIncorrectButton.bind(this);
   }
   componentWillMount() {
-    this.props.onMount();
     // not sure of the best way to initialize three incorrect fields
-    for (let i = 1; i <= 3; i++) {
-      this.props.fields.incorrect.addField();
+    if (this.props.formType !== 'edit') {
+      for (let i = 1; i <= 3; i++) {
+        this.props.fields.incorrect.addField();
+      }
     }
-  }
-  componentWillUnmount() {
-    this.props.onUnmount();
-  }
-  validationState(field) {
-    if (this.props.submitFailed && field.error) return 'error';
-    return null;
-  }
-  errorMessage(field) {
-    if (this.props.submitFailed && field.error) return field.error;
-    return null;
   }
   addIncorrectAnswer(event) {
     event.preventDefault();
@@ -70,47 +55,53 @@ class QuestionForm extends Component {
     return false;
   }
   render() {
+    if (this.props.isFetching) {
+      return (
+        <div>
+          <h3>Loading</h3>
+          <hr />
+        </div>
+      );
+    }
     const {
       fields: { text, correct, incorrect },
       handleSubmit,
       resetForm,
       submitting,
+      submitFailed,
+      title,
     } = this.props;
     return (
       <div>
-        <h3>Add a question</h3>
-        <form className="form-horizontal" onSubmit={handleSubmit(submit)}>
-          <Input
+        <div className="row">
+          <div className="col-xs-12">
+            <h3>
+              {title}
+              <Link to="/question" className="close"><span>&times;</span></Link>
+            </h3>
+          </div>
+        </div>
+        <hr />
+        <form className="form-horizontal" onSubmit={handleSubmit}>
+          <FormInput
             type="text"
             label="Question Text"
-            labelClassName="col-xs-3"
-            wrapperClassName="col-xs-9"
-            bsStyle={this.validationState(text)}
-            help={this.errorMessage(text)}
-            hasFeedback
-            {...text}
+            submitFailed={submitFailed}
+            field={text}
           />
-          <Input
+          <FormInput
             type="text"
             label="Correct Answer"
-            labelClassName="col-xs-3"
-            wrapperClassName="col-xs-9"
-            bsStyle={this.validationState(correct)}
-            help={this.errorMessage(correct)}
-            hasFeedback
-            {...correct}
+            submitFailed={submitFailed}
+            field={correct}
           />
           {incorrect.map((answer, index) =>
-            <Input
+            <FormInput
               key={index}
               type="text"
               label={`Incorrect Answer ${index + 1}`}
-              labelClassName="col-xs-3"
-              wrapperClassName="col-xs-9"
-              bsStyle={this.validationState(answer)}
-              help={this.errorMessage(answer)}
-              hasFeedback
-              {...answer}
+              submitFailed={submitFailed}
+              field={answer}
             />
           )}
           <div className="form-group">
@@ -142,6 +133,7 @@ class QuestionForm extends Component {
             </div>
           </div>
         </form>
+        <hr />
       </div>
     );
   }
@@ -152,25 +144,20 @@ QuestionForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
-  onMount: PropTypes.func.isRequired,
-  onUnmount: PropTypes.func.isRequired,
+  formType: PropTypes.string,
+  isFetching: PropTypes.bool,
+  title: PropTypes.string,
+  submit: PropTypes.func,
 };
 
-const mapStateToProps = () => ({});
-
-const mapDispatchToProps = (dispatch) => ({
-  onMount: () => {
-    dispatch(showForm());
-  },
-  onUnmount: () => {
-    dispatch(hideForm());
-  },
+const mapStateToProps = (state) => ({
+  isFetching: state.questionForm.isFetching,
 });
 
 QuestionForm = reduxForm({
   form: 'question',
   fields,
   validate: validateQuestionForm,
-}, mapStateToProps, mapDispatchToProps)(QuestionForm);
+}, mapStateToProps)(QuestionForm);
 
 export default QuestionForm;

@@ -39,10 +39,14 @@ class Game extends Component {
         <h2>Loading...</h2>
       );
     } else if (game.finished) {
+      const points = game.points;
+      const count = game.questions.length;
+      const percentage = Number((points / count * 100).toFixed(2));
       return (
         <div>
           <h2>Game over</h2>
-          <Button onClick={this.props.onNewGame}>New Game</Button>
+          <h3>Score: {`${points}/${count} --- ${percentage}%`}</h3>
+          <Button bsStyle="primary" onClick={this.props.onFinishGame}>Done</Button>
         </div>
       );
     }
@@ -73,7 +77,7 @@ class Game extends Component {
 Game.propTypes = {
   onNewQuestion: React.PropTypes.func,
   onSelectAnswer: React.PropTypes.func,
-  onNewGame: React.PropTypes.func,
+  onFinishGame: React.PropTypes.func,
   onFetchGame: React.PropTypes.func,
   params: React.PropTypes.shape({
     game_id: React.PropTypes.string,
@@ -90,7 +94,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onNewGame: () => {
+  onFinishGame: () => {
     dispatch(reset());
   },
   onFetchGame: (gameId) => {

@@ -32,14 +32,14 @@ function receiveGameQuestion(question) {
     payload: { question },
   };
 }
-export function showForm() {
-  return { type: types.SHOW_FORM };
+function showAlert(style, message) {
+  return {
+    type: types.SHOW_ALERT,
+    payload: { style, message },
+  };
 }
-export function hideForm() {
-  return { type: types.HIDE_FORM };
-}
-function questionAddSuccess() {
-  return { type: types.QUESTION_ADD_SUCCESS };
+export function hideAlert() {
+  return { type: types.HIDE_ALERT };
 }
 export function resetQuestionForm() {
   return { type: types.RESET_QUESTION_FORM };
@@ -55,6 +55,15 @@ function receiveQuestions(questions) {
 }
 export function resetQuestionList() {
   return { type: types.RESET_QUESTION_LIST };
+}
+function requestQuestion() {
+  return { type: types.REQUEST_QUESTION };
+}
+function receiveQuestion(question) {
+  return {
+    type: types.RECEIVE_QUESTION,
+    payload: { question },
+  };
 }
 
 export function fetchGame(id) {
@@ -80,24 +89,27 @@ export function fetchGame(id) {
   };
 }
 
-export function newGame() {
-  return (dispatch) => {
-    dispatch(requestGame());
-    fetch('http://localhost:8080/api/games', {
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        limit: 3,
-      }),
+export function newGame(values) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      dispatch(requestGame());
+      const limit = Math.abs(parseInt(values.questions, 10)) || 5;
+      fetch('http://localhost:8080/api/games', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ limit }),
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        browserHistory.push(`/game/${json._id}`);
+        return resolve();
+      });
     })
-    .then(response => response.json())
-    .then(json => {
-      browserHistory.push(`/game/${json._id}`);
-    });
-  };
+  );
 }
 
 export function reset() {
@@ -142,6 +154,17 @@ export function selectAnswer(gameId, questionId, index) {
   };
 }
 
+export function fetchQuestions() {
+  return (dispatch) => {
+    dispatch(requestQuestions());
+    fetch('http://localhost:8080/api/questions')
+    .then(response => response.json())
+    .then(json => {
+      dispatch(receiveQuestions(json));
+    });
+  };
+}
+
 export function addQuestion(values) {
   return (dispatch) => (
     new Promise((resolve, reject) => {
@@ -157,21 +180,45 @@ export function addQuestion(values) {
       .then(json => {
         // check for error
         if (json.errors) return reject(json.errors);
-        dispatch(questionAddSuccess());
+        dispatch(fetchQuestions());
         browserHistory.push('/question');
+        dispatch(showAlert('success', 'Question added'));
         return resolve();
       });
     })
   );
 }
 
-export function fetchQuestions() {
+export function editQuestion(questionId, values) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch(`http://localhost:8080/api/questions/${questionId}`, {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        dispatch(fetchQuestions());
+        browserHistory.push('/question');
+        dispatch(showAlert('success', 'Question edited'));
+        return resolve();
+      });
+    })
+  );
+}
+
+export function fetchQuestion(questionId) {
   return (dispatch) => {
-    dispatch(requestQuestions());
-    fetch('http://localhost:8080/api/questions')
+    dispatch(requestQuestion());
+    fetch(`http://localhost:8080/api/questions/${questionId}`)
     .then(response => response.json())
     .then(json => {
-      dispatch(receiveQuestions(json));
+      dispatch(receiveQuestion(json));
     });
   };
 }

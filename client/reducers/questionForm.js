@@ -1,23 +1,21 @@
 import * as types from '../actions/actionTypes';
 
 const initialState = {
-  showForm: false,
-  questionAddSuccess: false,
+  isFetching: false,
+  question: {},
 };
 
 export const questionForm = (state = initialState, action) => {
   switch (action.type) {
-    case types.SHOW_FORM:
-      return Object.assign({}, state, {
-        showForm: true,
-        questionAddSuccess: false,
-      });
-    case types.HIDE_FORM:
-      return Object.assign({}, state, { showForm: false });
-    case types.QUESTION_ADD_SUCCESS:
-      return Object.assign({}, state, { questionAddSuccess: true });
     case types.RESET_QUESTION_FORM:
       return initialState;
+    case types.REQUEST_QUESTION:
+      return Object.assign({}, state, { isFetching: true });
+    case types.RECEIVE_QUESTION:
+      return Object.assign({}, state, {
+        isFetching: false,
+        question: action.payload.question,
+      });
     default:
       return state;
   }

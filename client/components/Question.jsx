@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Alert } from 'react-bootstrap';
-import { resetQuestionForm, resetQuestionList } from '../actions';
+import { resetQuestionForm, resetQuestionList, hideAlert } from '../actions';
 import { connect } from 'react-redux';
 import QuestionList from './QuestionList';
 
@@ -9,36 +9,37 @@ class Question extends Component {
     this.props.onReset();
   }
   render() {
+    const alert = this.props.alert;
     return (
       <div>
-        <h2>Questions</h2>
+        <h2>Question Database</h2>
         <hr />
-        {this.props.questionAddSuccess &&
-          <Alert bsStyle="success" onDismiss={this.props.onReset}>
-            Question added
+        {alert.display &&
+          <Alert bsStyle={alert.style} onDismiss={this.props.onDismissAlert}>
+            {alert.message}
           </Alert>
         }
-        {!this.props.showForm &&
-          <QuestionList />
-        }
         {this.props.children}
+        <QuestionList />
       </div>
     );
   }
 }
 Question.propTypes = {
-  showForm: PropTypes.bool.isRequired,
   onReset: PropTypes.func.isRequired,
+  onDismissAlert: PropTypes.func.isRequired,
   children: PropTypes.node,
-  questionAddSuccess: PropTypes.bool.isRequired,
+  alert: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
-  showForm: state.questionForm.showForm,
-  questionAddSuccess: state.questionForm.questionAddSuccess,
+  alert: state.alert,
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  onDismissAlert: () => {
+    dispatch(hideAlert());
+  },
   onReset: () => {
     dispatch(resetQuestionForm());
     dispatch(resetQuestionList());
