@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import random from 'mongoose-simple-random';
+import mongoosePaginate from 'mongoose-paginate';
 
 const Schema = mongoose.Schema;
 
@@ -13,12 +14,9 @@ const QuestionSchema = new Schema({
   incorrect: {
     type: [String],
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
 QuestionSchema.plugin(random);
+QuestionSchema.plugin(mongoosePaginate);
 
 const Question = mongoose.model('Question', QuestionSchema);
 

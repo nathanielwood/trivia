@@ -35,11 +35,7 @@ const GameSchema = new Schema({
     type: Boolean,
   },
   questions: [GameQuestionSchema],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
 
 const Game = mongoose.model('Game', GameSchema);
 

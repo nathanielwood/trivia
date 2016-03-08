@@ -13,3 +13,5 @@ export const REQUEST_QUESTION = 'REQUEST_QUESTION';
 export const RECEIVE_QUESTION = 'RECEIVE_QUESTION';
 export const SHOW_ALERT = 'SHOW_ALERT';
 export const HIDE_ALERT = 'HIDE_ALERT';
+export const SHOW_MODAL = 'SHOW_MODAL';
+export const HIDE_MODAL = 'HIDE_MODAL';

@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { validateQuestionForm } from '../utilities/validations';
 import FormInput from './FormInput';
+import { removeQuestion, showModal, hideModal } from '../actions';
 
 const fields = ['text', 'correct', 'incorrect[]'];
 
@@ -19,6 +20,7 @@ class QuestionForm extends Component {
     this.removeIncorrectAnswer = this.removeIncorrectAnswer.bind(this);
     this.disableAddIncorrectButton = this.disableAddIncorrectButton.bind(this);
     this.disableRemoveIncorrectButton = this.disableRemoveIncorrectButton.bind(this);
+    this.handleRemove = this.handleRemove.bind(this);
   }
   componentWillMount() {
     // not sure of the best way to initialize three incorrect fields
@@ -54,6 +56,10 @@ class QuestionForm extends Component {
     }
     return false;
   }
+  handleRemove(event) {
+    event.preventDefault();
+    if (this.props.id) this.props.onRemove(this.props.id);
+  }
   render() {
     if (this.props.isFetching) {
       return (
@@ -70,6 +76,8 @@ class QuestionForm extends Component {
       submitting,
       submitFailed,
       title,
+      formType,
+      modal,
     } = this.props;
     return (
       <div>
@@ -117,6 +125,13 @@ class QuestionForm extends Component {
                   disabled={submitting}
                   onClick={resetForm}
                 >Reset</Button>
+                {formType === 'edit' &&
+                  <Button
+                    type="button"
+                    disabled={submitting}
+                    onClick={this.props.onShowModal}
+                  >Remove</Button>
+                }
                 <Button
                   type="button"
                   disabled={this.disableRemoveIncorrectButton()}
@@ -132,6 +147,18 @@ class QuestionForm extends Component {
               </ButtonToolbar>
             </div>
           </div>
+          <Modal bsSize= "small" show={modal.show} onHide={this.props.onHideModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Remove Question?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Are you sure you want to remove this question?</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button bsStyle="success" onClick={this.handleRemove}>Yes</Button>
+              <Button bsStyle="danger" onClick={this.props.onHideModal}>No</Button>
+            </Modal.Footer>
+          </Modal>
         </form>
         <hr />
       </div>
@@ -148,16 +175,34 @@ QuestionForm.propTypes = {
   isFetching: PropTypes.bool,
   title: PropTypes.string,
   submit: PropTypes.func,
+  onRemove: PropTypes.func,
+  id: PropTypes.string,
+  modal: PropTypes.object,
+  onShowModal: PropTypes.func,
+  onHideModal: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
   isFetching: state.questionForm.isFetching,
+  modal: state.modal,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onRemove: (questionId) => {
+    dispatch(removeQuestion(questionId));
+  },
+  onShowModal: () => {
+    dispatch(showModal());
+  },
+  onHideModal: () => {
+    dispatch(hideModal());
+  },
 });
 
 QuestionForm = reduxForm({
   form: 'question',
   fields,
   validate: validateQuestionForm,
-}, mapStateToProps)(QuestionForm);
+}, mapStateToProps, mapDispatchToProps)(QuestionForm);
 
 export default QuestionForm;

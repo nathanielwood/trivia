@@ -65,6 +65,12 @@ function receiveQuestion(question) {
     payload: { question },
   };
 }
+export function showModal() {
+  return { type: types.SHOW_MODAL };
+}
+export function hideModal() {
+  return { type: types.HIDE_MODAL };
+}
 
 export function fetchGame(id) {
   return (dispatch) => {
@@ -154,10 +160,12 @@ export function selectAnswer(gameId, questionId, index) {
   };
 }
 
-export function fetchQuestions() {
+export function fetchQuestions(page) {
   return (dispatch) => {
     dispatch(requestQuestions());
-    fetch('http://localhost:8080/api/questions')
+    let query = '?limit=10';
+    if (page) query = `${query}&page=${page}`;
+    fetch(`http://localhost:8080/api/questions${query}`)
     .then(response => response.json())
     .then(json => {
       dispatch(receiveQuestions(json));
@@ -219,6 +227,27 @@ export function fetchQuestion(questionId) {
     .then(response => response.json())
     .then(json => {
       dispatch(receiveQuestion(json));
+    });
+  };
+}
+
+export function removeQuestion(questionId) {
+  return (dispatch) => {
+    dispatch(requestQuestion());
+    fetch(`http://localhost:8080/api/questions/${questionId}`, {
+      method: 'delete',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(json => {
+      if (json.errors) console.log(json.errors);
+      dispatch(resetQuestionForm());
+      dispatch(fetchQuestions());
+      browserHistory.push('/question');
+      dispatch(showAlert('success', 'Question removed'));
     });
   };
 }

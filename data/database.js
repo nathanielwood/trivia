@@ -5,7 +5,7 @@ import { validateQuestionForm } from '../client/utilities/validations';
 
 // cleans array of empty strings, null or undefined variables
 const cleanArray = (array) => {
-  if (array.constructor !== Array) return array;
+  if (array.constructor !== Array) return [array];
   return array.filter((v) => v === 0 || v);
 };
 
@@ -70,16 +70,25 @@ const getGameQuestionById = (req, res) => {
   });
 };
 
-const getQuestions = (req, res) => (
-  Question.find({}).sort({ createdAt: 'desc' }).limit(50).exec((err, questions) => {
+const getQuestions = (req, res) => {
+  const limit = req.query.limit || 10;
+  const page = req.query.page || 1;
+  return Question.paginate({}, {
+    select: 'updatedAt text correct incorrect',
+    sort: { updatedAt: -1 },
+    lean: true,
+    page,
+    limit,
+  }, (err, questions) => {
     if (err) return res.send(err);
     return res.json(questions);
-  })
-);
+  });
+};
 
 const getQuestionById = (req, res) => (
   Question.findById(req.params.question_id, (err, question) => {
     if (err) return res.send(err);
+    if (!question) return res.json({ message: 'Question not found' });
     return res.json(question);
   })
 );
@@ -206,6 +215,13 @@ const editQuestion = (req, res) => {
   );
 };
 
+const removeQuestion = (req, res) => {
+  Question.remove({ _id: req.params.question_id }, (err) => {
+    if (err) res.send(err);
+    res.json({ message: 'Successfully deleted' });
+  });
+};
+
 export {
   getGames,
   getGameById,
@@ -217,4 +233,5 @@ export {
   nextGameQuestion,
   addQuestion,
   editQuestion,
+  removeQuestion,
 };

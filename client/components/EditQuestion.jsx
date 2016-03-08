@@ -28,6 +28,7 @@ class EditQuestion extends Component {
     };
     return (
       <QuestionForm
+        id={question._id}
         initialValues={initialValues}
         formType="edit"
         title="Edit a question"

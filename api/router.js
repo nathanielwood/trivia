@@ -4,6 +4,7 @@ import {
   getQuestionById,
   addQuestion,
   editQuestion,
+  removeQuestion,
   getGames,
   addGame,
   getGameById,
@@ -29,7 +30,8 @@ router.route('/questions')
 
 router.route('/questions/:question_id')
 .get(getQuestionById)
-.post(editQuestion);
+.post(editQuestion)
+.delete(removeQuestion);
 // .put((req, res) => {
 //   Question.findById(req.params.question_id, (err, question) => {
 //     if (err) res.send(err);
