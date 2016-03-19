@@ -1,36 +1,38 @@
-import React, { Component } from 'react';
+// client/components/Status.jsx
+
+import React, { PropTypes } from 'react';
 import Button from 'react-bootstrap/lib/Button';
 
-export default class Status extends Component {
-  render() {
-    let status = '';
-    let button = '';
-    if (this.props.status.visible) {
-      if (this.props.status.correct) {
-        status = <h3>Correct!</h3>;
-      } else {
-        status = <h3>Incorrect</h3>;
-      }
-      button = (
-        <Button
-          onClick={this.props.onClick}
-          disabled={this.props.status.disableButton}
-        >Next</Button>
-      );
+const Status = (props) => {
+  let status = '';
+  let button = '';
+  if (props.status.visible) {
+    if (props.status.correct) {
+      status = <h3>Correct!</h3>;
+    } else {
+      status = <h3>Incorrect</h3>;
     }
-    return (
-      <div>
-        {status}
-        {button}
-      </div>
+    button = (
+      <Button
+        onClick={props.onClick}
+        disabled={props.status.disableButton}
+      >Next</Button>
     );
   }
-}
-Status.propTypes = {
-  status: React.PropTypes.shape({
-    visible: React.PropTypes.bool,
-    correct: React.PropTypes.bool,
-    disableButton: React.PropTypes.bool,
-  }),
-  onClick: React.PropTypes.func,
+  return (
+    <div>
+      {status}
+      {button}
+    </div>
+  );
 };
+Status.propTypes = {
+  status: PropTypes.shape({
+    visible: PropTypes.bool,
+    correct: PropTypes.bool,
+    disableButton: PropTypes.bool,
+  }),
+  onClick: PropTypes.func,
+};
+
+export default Status;

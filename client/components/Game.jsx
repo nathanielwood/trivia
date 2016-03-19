@@ -1,6 +1,8 @@
+// client/components/Game.jsx
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Button from 'react-bootstrap/lib/Button';
+import { Button, Well, PageHeader } from 'react-bootstrap';
 import MultiChoice from './MultiChoice';
 import Points from './Points';
 import Status from './Status';
@@ -43,26 +45,33 @@ class Game extends Component {
       const count = game.questions.length;
       const percentage = Number((points / count * 100).toFixed(2));
       return (
-        <div>
-          <h2>Game over</h2>
-          <h3>Score: {`${points}/${count} --- ${percentage}%`}</h3>
-          <Button bsStyle="primary" onClick={this.props.onFinishGame}>Done</Button>
+        <div className="row">
+          <div className="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
+            <Well>
+              <PageHeader>Game over</PageHeader>
+              <h3>{`${points}/${count}`}</h3>
+              <h3>{`${percentage}%`}</h3>
+              <hr />
+              <Button bsStyle="primary" onClick={this.props.onFinishGame} >Done</Button>
+            </Well>
+          </div>
         </div>
       );
     }
     return (
       <div className="row">
-        <div className="col-sm-9">
+        <div className="col-sm-9 col-md-offset-1 col-md-8">
           {this.props.question._id &&
-            <MultiChoice
-              questionNo={game.questionCursor + 1}
-              questionCount={game.questions.length}
-              question={this.props.question}
-              selectAnswer={this.selectAnswer}
-            />
+            <div>
+              <h3>Question {game.questionCursor + 1} of {game.questions.length}</h3>
+              <MultiChoice
+                question={this.props.question}
+                selectAnswer={this.selectAnswer}
+              />
+            </div>
           }
         </div>
-        <div className="col-sm-3">
+        <div className="col-sm-3 col-md-2">
           <Points points={game.points} />
           <hr />
           <Status

@@ -1,4 +1,7 @@
+// webpack.config.js
+
 const path = require('path');
+const BowerWebpackPlugin = require('bower-webpack-plugin');
 
 module.exports = {
   entry: ['./client/index.jsx'],
@@ -11,10 +14,17 @@ module.exports = {
     extensions: ['', '.js', '.jsx'],
   },
   module: {
-    loaders: [{
-      test: /\.jsx?/,
-      loaders: ['babel'],
-      include: path.join(__dirname, 'client'),
-    }],
+    loaders: [
+      {
+        test: /\.jsx?/,
+        loaders: ['babel'],
+        include: path.join(__dirname, 'client'),
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader',
+      },
+    ],
   },
+  plugins: [new BowerWebpackPlugin()],
 };

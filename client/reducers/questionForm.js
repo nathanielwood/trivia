@@ -1,3 +1,5 @@
+// client/reducers/questionForm.js
+
 import * as types from '../actions/actionTypes';
 
 const initialState = {
@@ -5,7 +7,7 @@ const initialState = {
   question: {},
 };
 
-export const questionForm = (state = initialState, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
     case types.RESET_QUESTION_FORM:
       return initialState;

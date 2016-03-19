@@ -1,6 +1,8 @@
+// client/reducers/questionList.js
+
 import * as types from '../actions/actionTypes';
 
-export const questionList = (state = {}, action) => {
+export default (state = {}, action) => {
   switch (action.type) {
     case types.REQUEST_QUESTIONS:
       return Object.assign({}, state, { isFetching: true });

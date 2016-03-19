@@ -1,3 +1,5 @@
+// client/reducers/game.js
+
 import * as types from '../actions/actionTypes';
 
 // MOCK UP STATE
@@ -14,7 +16,7 @@ import * as types from '../actions/actionTypes';
 //     },
 //   ],
 
-export const game = (state = {}, action) => {
+export default (state = {}, action) => {
   switch (action.type) {
     case types.REQUEST_GAME:
       return Object.assign({}, state, {

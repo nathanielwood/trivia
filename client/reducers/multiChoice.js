@@ -1,3 +1,5 @@
+// client/reducers/multiChoice.js
+
 import * as types from '../actions/actionTypes';
 
 // MOCK UP STATE
@@ -9,7 +11,7 @@ import * as types from '../actions/actionTypes';
 //   answers: ['one', 'two', 'three', 'four']
 // }
 
-export const multiChoice = (state = {}, action) => {
+export default (state = {}, action) => {
   switch (action.type) {
     case types.RECEIVE_GAME_QUESTION:
     case types.RECEIVE_GAME_ANSWER:

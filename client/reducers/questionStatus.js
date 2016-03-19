@@ -1,3 +1,5 @@
+// client/reducers/questionStatus.js
+
 import * as types from '../actions/actionTypes';
 
 const initialState = {
@@ -6,7 +8,7 @@ const initialState = {
   disableButton: false,
 };
 
-export const questionStatus = (state = initialState, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
     case types.REQUEST_GAME_QUESTION:
       return Object.assign({}, state, { disableButton: true });

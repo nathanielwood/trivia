@@ -1,5 +1,9 @@
+// client/actions/index.js
+/* global FB gapi */
+
 import fetch from 'isomorphic-fetch';
 import { browserHistory } from 'react-router';
+import cookie from 'react-cookie';
 import * as types from './actionTypes';
 
 function resetGame() {
@@ -32,6 +36,21 @@ function receiveGameQuestion(question) {
     payload: { question },
   };
 }
+function requestSingleGameQuestion() {
+  return { type: types.REQUEST_SINGLE_GAME_QUESTION };
+}
+function receiveSingleGameQuestion(question) {
+  return {
+    type: types.RECEIVE_SINGLE_GAME_QUESTION,
+    payload: { question },
+  };
+}
+export function answerSingleGameQuestion(answer, correct) {
+  return {
+    type: types.ANSWER_SINGLE_GAME_QUESTION,
+    payload: { answer, correct },
+  };
+}
 function showAlert(style, message) {
   return {
     type: types.SHOW_ALERT,
@@ -56,6 +75,12 @@ function receiveQuestions(questions) {
 export function resetQuestionList() {
   return { type: types.RESET_QUESTION_LIST };
 }
+export function setFilterOptions(options) {
+  return {
+    type: types.SET_FILTER_OPTIONS,
+    payload: { options },
+  };
+}
 function requestQuestion() {
   return { type: types.REQUEST_QUESTION };
 }
@@ -70,6 +95,280 @@ export function showModal() {
 }
 export function hideModal() {
   return { type: types.HIDE_MODAL };
+}
+function requestUser() {
+  return { type: types.REQUEST_USER };
+}
+function receiveUser(user) {
+  return {
+    type: types.RECEIVE_USER,
+    payload: { user },
+  };
+}
+function resetUser() {
+  return { type: types.RESET_USER };
+}
+function requestTokenValidation() {
+  return { type: types.REQUEST_TOKEN_VALIDATION };
+}
+function receiveTokenValidation(valid) {
+  return {
+    type: types.RECEIVE_TOKEN_VALIDATION,
+    payload: { valid },
+  };
+}
+function passwordChanged() {
+  return { type: types.PASSWORD_CHANGED };
+}
+
+export function registerUser(values) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/accounts/register', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        cookie.save('auth', json.token, { path: '/' });
+        browserHistory.push('/');
+        dispatch(receiveUser(json.user));
+        return resolve();
+      });
+    })
+  );
+}
+
+export function loginUser(values) {
+  return dispatch => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/accounts/login', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        cookie.save('auth', json.token, { path: '/' });
+        browserHistory.push('/');
+        dispatch(receiveUser(json.user));
+        return resolve();
+      });
+    })
+  );
+}
+
+export function logoutUser() {
+  return (dispatch) => {
+    dispatch(resetUser());
+    cookie.remove('auth', { path: '/' });
+    // logout of Facebook if applicable
+    if (typeof FB !== 'undefined') {
+      FB.getLoginStatus(res => {
+        if (res.status === 'connected') FB.logout();
+      });
+    }
+    // logout of Google if applicable
+    if (typeof gapi !== 'undefined' && gapi.auth2) {
+      const auth2 = gapi.auth2.getAuthInstance();
+      if (auth2.isSignedIn.get()) {
+        auth2.signOut();
+      }
+    }
+  };
+}
+
+export function loginFacebook(values) {
+  return (dispatch) => {
+    fetch('http://localhost:8080/api/accounts/facebook', {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${values.authResponse.accessToken}`,
+      },
+    })
+    .then(response => {
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => {
+      cookie.save('auth', json.token, { path: '/' });
+      browserHistory.push('/');
+      dispatch(receiveUser(json.user));
+    }, () => {
+      // handle unauthorized access token
+    });
+  };
+}
+
+export function loginGoogle(values) {
+  return (dispatch) => {
+    fetch('http://localhost:8080/api/accounts/google', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_token: values.id_token }),
+    })
+    .then(response => {
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => {
+      cookie.save('auth', json.token, { path: '/' });
+      browserHistory.push('/');
+      dispatch(receiveUser(json.user));
+    }, () => {
+      // handle unauthorized access token
+    });
+  };
+}
+
+export function registerUsername(values) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/accounts/register-username', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: cookie.load('auth'),
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        dispatch(receiveUser(json.user));
+        return resolve();
+      }, () => {
+        // handle unauthorized access token
+      });
+    })
+  );
+}
+
+export function getUser(token) {
+  return (dispatch) => {
+    dispatch(requestUser());
+    fetch('http://localhost:8080/api/accounts/profile', {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        Authorization: token,
+      },
+    })
+    .then(response => {
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => (
+      dispatch(receiveUser(json.user))
+    ), () => {
+      // token unauthorized, user needs to login again
+      dispatch(logoutUser());
+      browserHistory.push('/login');
+    });
+  };
+}
+
+export function forgotPassword(values) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/forgot-password', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        dispatch(showAlert('success', json.message));
+        return resolve();
+      });
+    })
+  );
+}
+
+export function validateForgotPasswordToken(token) {
+  return (dispatch) => {
+    dispatch(requestTokenValidation());
+    fetch('http://localhost:8080/api/forgot-password/validate', {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `JWT ${token}`,
+      },
+    })
+    .then(response => {
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => {
+      dispatch(receiveTokenValidation(json.success));
+    }, () => {
+      dispatch(receiveTokenValidation(false));
+    });
+  };
+}
+
+export function resetPassword(values, token) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/reset-password', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${token}`,
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (json.success) {
+          dispatch(passwordChanged());
+        } else {
+          dispatch(receiveTokenValidation(false));
+        }
+        return resolve();
+      }, () => {
+        dispatch(receiveTokenValidation(false));
+        return reject();
+      });
+    })
+  );
 }
 
 export function fetchGame(id) {
@@ -91,6 +390,17 @@ export function fetchGame(id) {
         dispatch(receiveGame(json));
         dispatch(receiveGameQuestion(question));
       }
+    });
+  };
+}
+
+export function fetchSingleGameQuestion() {
+  return (dispatch) => {
+    dispatch(requestSingleGameQuestion());
+    fetch('http://localhost:8080/api/games')
+    .then(response => response.json())
+    .then(json => {
+      dispatch(receiveSingleGameQuestion(json.question));
     });
   };
 }
@@ -160,64 +470,23 @@ export function selectAnswer(gameId, questionId, index) {
   };
 }
 
-export function fetchQuestions(page) {
+export function fetchQuestions(options, page) {
   return (dispatch) => {
     dispatch(requestQuestions());
-    let query = '?limit=10';
+    const limit = options && options.limit ? options.limit : '20';
+    let query = `?limit=${limit}`;
     if (page) query = `${query}&page=${page}`;
+    if (options && options.showAnswers) query += '&answers=true';
+    if (options && options.terms) query = `${query}&terms=${encodeURIComponent(options.terms)}`;
+    if (options && options.username) {
+      query = `${query}&username=${encodeURIComponent(options.username)}`;
+    }
     fetch(`http://localhost:8080/api/questions${query}`)
     .then(response => response.json())
     .then(json => {
       dispatch(receiveQuestions(json));
     });
   };
-}
-
-export function addQuestion(values) {
-  return (dispatch) => (
-    new Promise((resolve, reject) => {
-      fetch('http://localhost:8080/api/questions', {
-        method: 'post',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      })
-      .then(response => response.json())
-      .then(json => {
-        // check for error
-        if (json.errors) return reject(json.errors);
-        dispatch(fetchQuestions());
-        browserHistory.push('/question');
-        dispatch(showAlert('success', 'Question added'));
-        return resolve();
-      });
-    })
-  );
-}
-
-export function editQuestion(questionId, values) {
-  return (dispatch) => (
-    new Promise((resolve, reject) => {
-      fetch(`http://localhost:8080/api/questions/${questionId}`, {
-        method: 'post',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      })
-      .then(response => response.json())
-      .then(json => {
-        if (json.errors) return reject(json.errors);
-        dispatch(fetchQuestions());
-        browserHistory.push('/question');
-        dispatch(showAlert('success', 'Question edited'));
-        return resolve();
-      });
-    })
-  );
 }
 
 export function fetchQuestion(questionId) {
@@ -231,7 +500,74 @@ export function fetchQuestion(questionId) {
   };
 }
 
-export function removeQuestion(questionId) {
+export function addQuestion(values, listOptions, page) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch('http://localhost:8080/api/questions', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: cookie.load('auth'),
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then(json => {
+        // check for error
+        if (json.errors) return reject(json.errors);
+        dispatch(fetchQuestions(listOptions, page));
+        browserHistory.push('/question');
+        dispatch(showAlert('success', 'Question added'));
+        return resolve();
+      }, () => {
+        // token unauthorized, user needs to login again
+        dispatch(logoutUser());
+        browserHistory.push('/login');
+      });
+    })
+  );
+}
+
+export function editQuestion(questionId, values, listOptions, page) {
+  return (dispatch) => (
+    new Promise((resolve, reject) => {
+      fetch(`http://localhost:8080/api/questions/${questionId}`, {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: cookie.load('auth'),
+        },
+        body: JSON.stringify(values),
+      })
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (json.errors) return reject(json.errors);
+        dispatch(fetchQuestions(listOptions, page));
+        browserHistory.push('/question');
+        dispatch(showAlert('success', 'Question edited'));
+        return resolve();
+      }, () => {
+        // token unauthorized, user needs to login again
+        dispatch(logoutUser());
+        browserHistory.push('/login');
+      });
+    })
+  );
+}
+
+export function removeQuestion(questionId, listOptions, page) {
   return (dispatch) => {
     dispatch(requestQuestion());
     fetch(`http://localhost:8080/api/questions/${questionId}`, {
@@ -239,15 +575,25 @@ export function removeQuestion(questionId) {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: cookie.load('auth'),
       },
     })
-    .then(response => response.json())
+    .then(response => {
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
     .then(json => {
-      if (json.errors) console.log(json.errors);
+      if (!json.success) return dispatch(showAlert('danger', json.message));
       dispatch(resetQuestionForm());
-      dispatch(fetchQuestions());
+      dispatch(fetchQuestions(listOptions, page));
       browserHistory.push('/question');
-      dispatch(showAlert('success', 'Question removed'));
+      return dispatch(showAlert('success', json.message));
+    }, () => {
+      // token unauthorized, user needs to login again
+      dispatch(logoutUser());
+      browserHistory.push('/login');
     });
   };
 }

@@ -1,14 +1,34 @@
-import React, { Component } from 'react';
+// client/components/AddQuestion.jsx
+
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
 import QuestionForm from './QuestionForm';
+import ErrorMessage from './ErrorMessage';
 import { addQuestion } from '../actions';
 
-export default class AddQuestion extends Component {
-  handleSubmit(values, dispatch) {
-    return dispatch(addQuestion(values));
-  }
-  render() {
+const AddQuestion = (props) => {
+  const handleSubmit = (values, dispatch) => (
+    dispatch(addQuestion(values, props.listOptions, props.list.pagination.page))
+  );
+  if (!props.user.id) {
     return (
-      <QuestionForm title="Add a question" onSubmit={this.handleSubmit} />
+      <ErrorMessage error="Please login to add a new question" />
     );
   }
-}
+  return (
+    <QuestionForm title="Add a question" onSubmit={handleSubmit} />
+  );
+};
+AddQuestion.propTypes = {
+  user: PropTypes.object,
+  listOptions: PropTypes.object,
+  list: PropTypes.object,
+};
+
+const mapStateToProps = (state) => ({
+  user: state.user,
+  listOptions: state.questionListOptions,
+  list: state.questionList,
+});
+
+export default connect(mapStateToProps)(AddQuestion);

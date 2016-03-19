@@ -1,26 +1,35 @@
+// api/index.js
+
 import express from 'express';
 import { urlencoded, json } from 'body-parser';
 import mongoose from 'mongoose';
+import passport from 'passport';
 import router from './router';
+import config from '../config';
+import strategies from './strategies';
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/trivia');
-
-const API_PORT = 8080;
+const API_PORT = config.api.port;
+mongoose.connect(process.env.MONGO_URI || config.database.url);
+strategies(passport);
 
 const api = express();
 api.use(urlencoded({ extended: true }));
 api.use(json());
+api.use(passport.initialize());
 
 // enable CORS
 api.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
   next();
 });
 
 // Register the Routes
 api.use('/api', router);
+
 
 // Start API server
 api.listen(API_PORT, () => {

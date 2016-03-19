@@ -1,3 +1,5 @@
+// client/components/Question.jsx
+
 import React, { Component, PropTypes } from 'react';
 import { Alert } from 'react-bootstrap';
 import { resetQuestionForm, resetQuestionList, hideAlert } from '../actions';

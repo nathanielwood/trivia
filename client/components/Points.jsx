@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+// client/components/Points.jsx
 
-export default class Points extends Component {
-  render() {
-    return (
-      <h3>Points: {this.props.points}</h3>
-    );
-  }
-}
+import React, { PropTypes } from 'react';
+
+const Points = (props) => (
+  <h3>Points: {props.points}</h3>
+);
 Points.propTypes = {
-  points: React.PropTypes.number,
+  points: PropTypes.number,
 };
+
+export default Points;

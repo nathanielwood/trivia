@@ -1,6 +1,8 @@
+// client/components/StartGame.jsx
+
 import React, { Component, PropTypes } from 'react';
 import { browserHistory } from 'react-router';
-import { ButtonInput } from 'react-bootstrap';
+import { PageHeader, ButtonInput, Well } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 import { newGame } from '../actions';
 import FormInput from './FormInput';
@@ -26,27 +28,32 @@ class StartGame extends Component {
     } = this.props;
     questions.min = 1;
     return (
-      <div>
-        <h2>Play a trivia game</h2>
+      <Well>
+        <PageHeader>Play a trivia game</PageHeader>
+        <p>
+          A random set of questions will be pulled from the database.
+           You can specify how many questions you want in your game.
+            More options (i.e. category selections) will be available in future updates.
+        </p>
         <form className="form-horizontal" onSubmit={handleSubmit(submit)}>
           <FormInput
             type="number"
-            label="Max. number of questions"
+            label="Max. # of questions"
             submitFailed={submitFailed}
-            overrideLabelClassName="col-xs-4"
-            overrideWrapperClassName="col-xs-2"
+            overrideLabelClassName="col-xs-12 col-sm-3 col-md-4"
+            overrideWrapperClassName="col-xs-12 col-sm-9 col-md-4"
             field={questions}
           />
           <ButtonInput
             type="submit"
             disabled={submitting}
-            wrapperClassName="col-xs-offset-4 col-xs-8"
+            wrapperClassName="col-xs-12 col-sm-offset-3 col-md-offset-4"
             bsStyle="primary"
           >
             Start game
           </ButtonInput>
         </form>
-      </div>
+      </Well>
     );
   }
 }
@@ -65,7 +72,7 @@ const mapStateToProps = (state) => ({
 StartGame = reduxForm({
   form: 'startGame',
   fields,
-  initialValues: { questions: 5 },
+  initialValues: { questions: 10 },
   // validate
 }, mapStateToProps)(StartGame);
 

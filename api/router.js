@@ -1,57 +1,97 @@
+// api/router.js
+
 import express from 'express';
+import passport from 'passport';
 import {
   getQuestions,
   getQuestionById,
   addQuestion,
   editQuestion,
   removeQuestion,
-  getGames,
+  authorizeQuestionChange,
+} from './controllers/question';
+import {
+  // getGames,
+  getSingleGameQuestion,
   addGame,
   getGameById,
   getGameQuestionById,
   answerGameQuestion,
   nextGameQuestion,
-} from '../data/database';
+} from './controllers/game';
+import {
+  addLocal,
+  loginLocal,
+  loginFacebook,
+  loginGoogle,
+  getUser,
+  forgotPassword,
+  resetPassword,
+  registerUsername,
+  requireUsername,
+} from './controllers/user';
 // import Question from '../data/models/Question';
 
 // Routes for the API
 const router = new express.Router();
 
+const authorize = () => (
+  passport.authenticate('authorization', { session: false })
+);
+
 // middleware to use for all requests
 router.use((req, res, next) => {
-  // do logging
-  console.log('Middleware'); // eslint-disable-line
+  // TODO logging
   next();
 });
 
+router.route('/accounts/register')
+.post(addLocal);
+
+router.route('/accounts/login')
+.post(loginLocal);
+
+router.route('/accounts/register-username')
+.post(authorize(), registerUsername);
+
+router.route('/accounts/facebook')
+.get(passport.authenticate('facebook-token', { session: false }), loginFacebook);
+
+router.route('/accounts/google')
+.post(passport.authenticate('google-id-token', { session: false }), loginGoogle);
+
+router.route('/accounts/profile')
+.get(authorize(), getUser);
+
+router.route('/forgot-password')
+.post(forgotPassword);
+
+router.route('/forgot-password/validate')
+.get(passport.authenticate('forgot-password', { session: false }), (req, res) => {
+  res.json({
+    success: true,
+    message: 'Token validated',
+  });
+});
+
+router.route('/reset-password')
+.post(passport.authenticate('forgot-password', { session: false }), resetPassword);
+
 router.route('/questions')
-.post(addQuestion)
-.get(getQuestions);
+.get(getQuestions)
+.post(authorize(), requireUsername, addQuestion);
 
 router.route('/questions/:question_id')
 .get(getQuestionById)
-.post(editQuestion)
-.delete(removeQuestion);
-// .put((req, res) => {
-//   Question.findById(req.params.question_id, (err, question) => {
-//     if (err) res.send(err);
-//     const updateQuestion = question;
-//     updateQuestion.text = req.body.text;
-//     updateQuestion.save((err2) => {
-//       if (err2) res.send(err2);
-//       res.json({ message: 'Question updated!' });
-//     });
-//   });
-// })
-// .delete((req, res) => {
-//   Question.remove({ _id: req.params.question_id }, (err) => {
-//     if (err) res.send(err);
-//     res.json({ message: 'Successfully deleted' });
-//   });
-// });
+.post(authorize(), requireUsername, authorizeQuestionChange, editQuestion)
+.delete(authorize(), requireUsername, authorizeQuestionChange, removeQuestion);
 
 router.route('/games')
-.get(getGames)
+// disabled because it would give out game id's which people could
+// then mess with
+// .get(getGames)
+// use get to get single random game question instead
+.get(getSingleGameQuestion)
 .post(addGame);
 
 router.route('/games/:game_id')

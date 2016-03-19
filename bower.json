@@ -1,0 +1,21 @@
+{
+  "name": "trivia",
+  "description": "A trivia game",
+  "main": "index.js",
+  "authors": [
+    "Nathaniel Wood"
+  ],
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/nathanielwood/trivia",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-social": "^4.12.0"
+  }
+}

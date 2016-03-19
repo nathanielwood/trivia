@@ -1,3 +1,4 @@
+// dev-server.js
 // modeled after https://github.com/gaearon/react-transform-boilerplate
 
 import express from 'express';

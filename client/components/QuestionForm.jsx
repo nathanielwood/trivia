@@ -1,10 +1,12 @@
+// client/components/QuestionForm.jsx
+
 import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { validateQuestionForm } from '../utilities/validations';
 import FormInput from './FormInput';
-import { removeQuestion, showModal, hideModal } from '../actions';
+import { showModal, hideModal } from '../actions';
 
 const fields = ['text', 'correct', 'incorrect[]'];
 
@@ -20,7 +22,6 @@ class QuestionForm extends Component {
     this.removeIncorrectAnswer = this.removeIncorrectAnswer.bind(this);
     this.disableAddIncorrectButton = this.disableAddIncorrectButton.bind(this);
     this.disableRemoveIncorrectButton = this.disableRemoveIncorrectButton.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
   }
   componentWillMount() {
     // not sure of the best way to initialize three incorrect fields
@@ -55,10 +56,6 @@ class QuestionForm extends Component {
       return true;
     }
     return false;
-  }
-  handleRemove(event) {
-    event.preventDefault();
-    if (this.props.id) this.props.onRemove(this.props.id);
   }
   render() {
     if (this.props.isFetching) {
@@ -113,7 +110,7 @@ class QuestionForm extends Component {
             />
           )}
           <div className="form-group">
-            <div className="col-xs-offset-3 col-xs-9">
+            <div className="col-sm-offset-3 col-sm-9">
               <ButtonToolbar>
                 <Button
                   type="submit"
@@ -155,7 +152,7 @@ class QuestionForm extends Component {
               <p>Are you sure you want to remove this question?</p>
             </Modal.Body>
             <Modal.Footer>
-              <Button bsStyle="success" onClick={this.handleRemove}>Yes</Button>
+              <Button bsStyle="success" onClick={this.props.onRemove}>Yes</Button>
               <Button bsStyle="danger" onClick={this.props.onHideModal}>No</Button>
             </Modal.Footer>
           </Modal>
@@ -188,9 +185,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onRemove: (questionId) => {
-    dispatch(removeQuestion(questionId));
-  },
   onShowModal: () => {
     dispatch(showModal());
   },

@@ -1,3 +1,5 @@
+// client/reducers/alert.js
+
 import * as types from '../actions/actionTypes';
 
 const initialState = {
@@ -6,7 +8,7 @@ const initialState = {
   message: '',
 };
 
-export const alert = (state = initialState, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
     case types.SHOW_ALERT:
       return Object.assign({}, state, {
