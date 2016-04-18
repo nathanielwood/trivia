@@ -1,0 +1,6 @@
+[submodule "trivia-station-server"]
+	path = trivia-station-server
+	url = https://github.com/nathanielwood/trivia-station-server.git
+[submodule "trivia-station-client"]
+	path = trivia-station-client
+	url = https://github.com/nathanielwood/trivia-station-client.git
