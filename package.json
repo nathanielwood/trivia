@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Trivia Station dev environment, combines client and server submodules",
   "scripts": {
-    "prep-dev": "node .node_modules/concurrently/src/main.js --kill others \"npm run prep-server-dev\" \"npm run prep-client-dev\"",
+    "prep-dev": "npm install && npm run prep-server-dev && npm run prep-client-dev",
     "prep-server-dev": "cd trivia-station-server && cp config/outline.js config/custom.js && npm install && npm run seed",
     "prep-client-dev": "cd trivia-station-client && cp config/outline.js config/custom.js && bower install && npm install",
-    "start": "node .node_modules/concurrently/src/main.js --kill-others \"npm run start-server-dev\" \"npm run start-client-dev\"",
+    "start": "node node_modules/concurrently/src/main.js --kill-others \"npm run start-server-dev\" \"npm run start-client-dev\"",
     "start-server-dev": "cd trivia-station-server && npm run dev",
     "start-client-dev": "cd trivia-station-client && npm run dev"
   },
